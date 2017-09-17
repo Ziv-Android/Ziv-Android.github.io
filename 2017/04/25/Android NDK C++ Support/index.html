@@ -1,0 +1,69 @@
+<!DOCTYPE html><html><head><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="description" content="Summary knowledge to share."><title>Android NDK C++ Support | Ziv‘s blog</title><link rel="stylesheet" type="text/css" href="/css/normalize.css"><link rel="stylesheet" type="text/css" href="/css/highlight.css"><link rel="stylesheet" type="text/css" href="/css/font.css"><link rel="stylesheet" type="text/css" href="/css/noise.css"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/font-awesome/4.5.0/css/font-awesome.min.css"><link rel="Shortcut Icon" type="image/x-icon" href="/favicon.ico"></head><body><!-- gallery that comes before the header--><article class="wrapper"><div class="post-main"><div class="nav"><nav class="container"><a href="/" class="sidebar-nav-item active">Home</a><a href="/archives" class="sidebar-nav-item">Archives</a></nav><div class="container post-meta"><div class="post-time">2017-04-25</div></div></div><div class="container post-header"><h1>Android NDK C++ Support</h1></div><div class="container post-content"><h2 id="支持的C-运行库比较"><a href="#支持的C-运行库比较" class="headerlink" title="支持的C++运行库比较"></a>支持的C++运行库比较</h2><table>
+<thead>
+<tr>
+<th>C++运行库</th>
+<th>C++异常支持</th>
+<th>C++RTTI支持</th>
+<th>C++标准库</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>system系统库</td>
+<td>No</td>
+<td>No</td>
+<td>No</td>
+</tr>
+<tr>
+<td>GAbi++</td>
+<td>No</td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+<tr>
+<td>STLport</td>
+<td>No</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>GNU STL</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table>
+<p>在Application.mk文件中控制使用<br><figure class="highlight makefile"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">APP_STL := system</div></pre></td></tr></table></figure></p>
+<p>默认使用system，使用最多的设置是gnustl_static</p>
+<h3 id="C-异常的支持"><a href="#C-异常的支持" class="headerlink" title="C++异常的支持"></a>C++异常的支持</h3><p>不仅仅需要在Application.mk中配置<code>APP_CPPFLAGS += -fexceptions</code>，还需要在Android.mk对应的module下添加<code>LOCAL_CPP_FEATURES += exceptions</code></p>
+<h3 id="C-RTTI的支持"><a href="#C-RTTI的支持" class="headerlink" title="C++RTTI的支持"></a>C++RTTI的支持</h3><p>Run-Time Type Information运行库类型信息，是一种机制，用于执行安全类型转化。考虑兼容性和性能，默认不开启<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">LOCAL_CPP_FEATURES += rtti</div></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">APP_CPPFLAGS += -frtti</div></pre></td></tr></table></figure>
+<h2 id="静态库与动态库的选择"><a href="#静态库与动态库的选择" class="headerlink" title="静态库与动态库的选择"></a>静态库与动态库的选择</h2><p>静态库：项目仅包含单一的原生模块<br>动态库：项目包含多个原生模块<br>逆向加载库文件，先加载依赖库，然后才可以加载依赖于它的原生模块</p>
+<h2 id="C-标准库入门"><a href="#C-标准库入门" class="headerlink" title="C++标准库入门"></a>C++标准库入门</h2><ol>
+<li><a href="http://www.stlport.org/doc" target="_blank" rel="external">STLport文档</a></li>
+<li><a href="http://gcc.gnu.org/onlinedocs/libstdc++/" target="_blank" rel="external">GNU STL文档</a></li>
+</ol>
+<h3 id="容器"><a href="#容器" class="headerlink" title="容器"></a>容器</h3><p>容器是一个对象，存放其他对象，提供访问操作元素的方法，并提供容器内对象的生命周期</p>
+<h4 id="序列"><a href="#序列" class="headerlink" title="序列"></a>序列</h4><p>序列是大小可变的元素线性排序的容器</p>
+<ol>
+<li>vector支持随机访问元素，支持在末尾以常量时间插入和删除元素，在其他位置以线性时间插入和删除元素</li>
+<li>deque支持vector所有，并且支持序列起始位置以常量时间插入和删除元素</li>
+<li>list双向链表</li>
+<li>slist单向链表<h4 id="关联容器"><a href="#关联容器" class="headerlink" title="关联容器"></a>关联容器</h4>关联容器是一种大小可变的容器，支持通过键高效检索</li>
+<li>排序关联容器<br>按区分大小写升序排序来存储键值，操作复杂度小于等于对数阶<br>set 元素不同，已排序<br>map 元素不同，键值对<br>multiset 元素允许相同，已排序<br>multimap 元素允许相同，一键对多值</li>
+<li>哈希关联容器<br>基于哈希表实现，适合做快速查询，不排序<br>hashed_set 不允许重复元素<br>hash_map 键值对<br>hash_multiset 允许重复元素<br>hash_multimap 元素允许相同，一键对多值<h4 id="适配器"><a href="#适配器" class="headerlink" title="适配器"></a>适配器</h4>容器适配器用于在已有的基本容器类型的基础上提供专门的容器类型</li>
+<li>stack 后进先出（LIFO）</li>
+<li>queue 先进先出（FIFO）<h4 id="String"><a href="#String" class="headerlink" title="String"></a>String</h4>String字符序列同样为容器类型，除序列常用的方法外，string类追加了标准的字符串操作方法，如字符串串联和搜索<h3 id="迭代器"><a href="#迭代器" class="headerlink" title="迭代器"></a>迭代器</h3>迭代器可以对指定范围内或一个容器内的对象进行迭代。迭代器是泛化指针，但它们被实现成为通用类的形式。迭代器是容器之间的接口和算法，基于访问权限的级别和要执行的操作类型，分5种基本迭代器：</li>
+<li>Input iterator: 读取引用元素的值</li>
+<li>Output iterator: 修改当前位置对象的值</li>
+<li>Forward iterator: 不规定输入输出操作，用于符合值的线性序列的多种算法</li>
+<li>Bidirectional iterator: 向前或向后遍历给定范围元素</li>
+<li>Random access iterator: 提供普通C指针算法的所有操作<h3 id="算法"><a href="#算法" class="headerlink" title="算法"></a>算法</h3>对给定范围的元素，算法提供功能对其搜索、替换、复制和提取边界。依靠迭代器多位接口遍历容器<h2 id="C-运行库线程安全"><a href="#C-运行库线程安全" class="headerlink" title="C++运行库线程安全"></a>C++运行库线程安全</h2>C++运行库的实现都是线程安全的，对共享容器的多线程读操作为线程安全，但读写同时操作需要保证互斥性<h2 id="C-运行库调试模式"><a href="#C-运行库调试模式" class="headerlink" title="C++运行库调试模式"></a>C++运行库调试模式</h2><h3 id="GNU-STL调试模式"><a href="#GNU-STL调试模式" class="headerlink" title="GNU STL调试模式"></a>GNU STL调试模式</h3>使用<code>_gnu_debug</code>命名空间代替<code>std</code>为容器提供调试模式启动副本，更优的选择使用预处理标识<code>_GLIBCXX_DEBUG</code><br>在Android.mk文件中使用<code>LOCAL_CFLAGS += -D_GLIBCXX_DEBUG</code>开启调试模式<h3 id="STLport调试模式"><a href="#STLport调试模式" class="headerlink" title="STLport调试模式"></a>STLport调试模式</h3>预处理标识<code>_STLP_DEBUG</code><br>在Android.mk文件中定义<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">LOCAL_CFLAGS += -D_STLP_DEBUG</div><div class="line">LOCAL_CFLAGE += -D_STLP_DEBUG_MESSAGE</div><div class="line">LOCAL_LDLIBS += -llog</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>实现全局函数<code>__stl_debug_message</code><br><figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdarg.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;android/log.h&gt;</span></span></div><div class="line"></div><div class="line"><span class="keyword">void</span> __stl_debug_message(<span class="keyword">const</span> <span class="keyword">char</span>* format_str, ...)&#123;</div><div class="line">  va_list ap;</div><div class="line">  va_start(ap, format_str);</div><div class="line">  __android_log_vprint(ANDROID_LOG_FATAL, <span class="string">"STLport"</span>, format_srt, ap);</div><div class="line">  va_end(ap);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+</div></div><div class="post-main post-comment"></div></article><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.css"><script src="//cdn.bootcss.com/jquery/2.0.3/jquery.min.js"></script><script src="//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.pack.js"></script><script>$(document).ready(function() {
+    $(".fancybox").fancybox();
+});
+</script></body></html>
